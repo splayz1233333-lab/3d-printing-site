@@ -9,7 +9,7 @@ body { font-family: Arial; background: #f4f6f8; margin: 0; }
 header { text-align: center; padding: 40px; background: #222; color: white; }
 .form { max-width: 500px; margin: 40px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
 label { font-weight: bold; margin-top: 10px; display: block; }
-input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #bbb; }
+input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 6px; border: 1px solid #bbb; box-sizing: border-box; }
 button { width: 100%; padding: 12px; margin-top: 20px; background: #0072ff; color: white; border: none; border-radius: 6px; cursor: pointer; }
 button:hover { background: #0056d6; }
 .price { font-weight: bold; margin-top: 10px; font-size: 18px; }
@@ -18,66 +18,68 @@ h2 { margin-top: 0; }
 </style>
 </head>
 <body>
-
 <header>
 <h1>3D Custom Service</h1>
 <p>Upload an STL file or send us a custom request</p>
 </header>
 
-<!-- Pricing Calculator -->
 <div class="form">
 <h2>Pricing Calculator</h2>
 <label>Estimated Weight (g):</label>
 <input type="number" id="weight" placeholder="Enter weight in grams. This is temporary, model will fully be reviewed through email">
-
 <label>Material:</label>
 <select id="material">
 <option value="0.20">PLA ($0.20/g)</option>
 <option value="0.25">ABS ($0.25/g)</option>
 <option value="0.30">PETG ($0.30/g)</option>
-<option value="0.30">TPU ($0.40/g)</option>
-<option value="0.30">Carbon fiber infused filament ($1.00/g)</option>
+<option value="0.40">TPU ($0.40/g)</option>
+<option value="1.00">Carbon fiber infused filament ($1.00/g)</option>
 </select>
-
 <p class="price">Estimated Price: <span id="p">$0.00</span></p>
 </div>
 
-<!-- Request Form -->
-<div class="form">
+<div class="form" id="formContainer">
 <h2>Submit Your Request</h2>
-<form action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data">
-  <!-- Replace with your Web3Forms access key -->
+<form action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data" id="requestForm">
   <input type="hidden" name="access_key" value="9410448a-3187-458c-84c3-734ced6af715">
+  <input type="hidden" name="redirect" value="false">
   
-  <label>Upload STL (optional):</label>
-  <input type="file" name="stl" accept=".stl">
-
-  <label>Description:</label>
-  <textarea name="message" placeholder="Describe your project..." required></textarea>
-
-  <label>Address(This is for shipping only your information will not be shared):</label>
-  <textarea name="message" placeholder="Start typing..." required></textarea>
-  
-  <label>Zip code:</label>
-  <textarea name="message" placeholder="Start typing" required></textarea>
-    
-  <label>Full Name(Please use your real name):</label>
-  <textarea name="message" placeholder="Start typing..." required></textarea>
-
   <label>Your Email:</label>
   <input type="email" name="email" placeholder="EX. name@gmail.com" required>
-    
+  
+  <label>Full Name (Please use your real name):</label>
+  <input type="text" name="name" placeholder="Start typing..." required>
+  
   <label>Phone Number:</label>
-  <input type="email" name="Phone Number" placeholder="EX. XXX-XXX-XXXX or XXXXXXXXXX" required>
-
+  <input type="tel" name="phone" placeholder="EX. XXX-XXX-XXXX or XXXXXXXXXX" required>
+  
+  <label>Address (This is for shipping only, your information will not be shared):</label>
+  <textarea name="address" rows="3" placeholder="Start typing..." required></textarea>
+  
+  <label>Zip Code:</label>
+  <input type="text" name="zipcode" placeholder="Start typing" required>
+  
+  <label>Upload STL (optional):</label>
+  <input type="file" name="attachment" accept=".stl">
+  
+  <label>Project Description:</label>
+  <textarea name="description" rows="4" placeholder="Describe your project..." required></textarea>
+  
   <button type="submit">Submit Request</button>
 </form>
+</div>
+
+<div class="form" id="successMessage" style="display: none; text-align: center;">
+<h2 style="color: #0072ff;">✓ Submission Accepted!</h2>
+<p>Thank you for your request. We've received your information and will review your project shortly.</p>
+<p>You should receive a confirmation email at the address you provided.</p>
+<p style="margin-top: 30px; color: #666;">We'll get back to you within 24-48 hours with a detailed quote.</p>
+<button onclick="location.reload()" style="margin-top: 20px;">Submit Another Request</button>
 </div>
 
 <footer>© 2025 3D Custom</footer>
 
 <script>
-// Pricing calculator
 function calc() {
   let w = parseFloat(document.getElementById("weight").value) || 0;
   let rate = parseFloat(document.getElementById("material").value);
@@ -85,7 +87,40 @@ function calc() {
 }
 document.getElementById("weight").addEventListener("input", calc);
 document.getElementById("material").addEventListener("change", calc);
+
+document.getElementById("requestForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const originalText = submitBtn.textContent;
+  
+  submitBtn.textContent = "Sending...";
+  submitBtn.disabled = true;
+  
+  try {
+    const formData = new FormData(form);
+    const response = await fetch(form.action, {
+      method: "POST",
+      body: formData
+    });
+    
+    if (response.ok) {
+      document.getElementById("formContainer").style.display = "none";
+      document.getElementById("successMessage").style.display = "block";
+      document.getElementById("successMessage").scrollIntoView({ behavior: "smooth" });
+    } else {
+      throw new Error("Submission failed");
+    }
+  } catch (error) {
+    alert("There was an error submitting your request. Please try again.");
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+  }
+});
 </script>
+</body>
+</html>
 
 </body>
 </html>
