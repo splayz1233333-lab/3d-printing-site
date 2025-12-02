@@ -253,6 +253,55 @@ footer {
   color: #764ba2;
   text-decoration: underline;
 }
+.faq-item {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.faq-item:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+.faq-question {
+  padding: 20px 25px;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #2d3748;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+.faq-question:hover {
+  background: rgba(102, 126, 234, 0.05);
+}
+.faq-arrow {
+  transition: transform 0.3s ease;
+  color: #667eea;
+  font-size: 0.9em;
+}
+.faq-arrow.open {
+  transform: rotate(180deg);
+}
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  padding: 0 25px;
+}
+.faq-answer.open {
+  max-height: 500px;
+  padding: 0 25px 20px 25px;
+}
+.faq-answer p {
+  color: #4a5568;
+  line-height: 1.8;
+  margin: 0;
+}
 </style>
 </head>
 <body>
@@ -266,6 +315,7 @@ footer {
 <div class="tabs">
   <button class="tab active" onclick="switchTab('home')">🏠 Home</button>
   <button class="tab" onclick="switchTab('printer')">🖨️ Our Printer</button>
+  <button class="tab" onclick="switchTab('faq')">❓ FAQ</button>
   <button class="tab" onclick="switchTab('contact')">📞 Contact Us</button>
 </div>
 
@@ -359,6 +409,67 @@ footer {
 <p style="color: #667eea; font-weight: 600; font-size: 1.1em;">We'll get back to you within 24-48 hours with a detailed quote.</p>
 <button onclick="location.reload()" style="margin-top: 30px; max-width: 300px; margin-left: auto; margin-right: auto;">Submit Another Request</button>
 </div>
+</div>
+
+<!-- FAQ Tab Content -->
+<div id="faqTab" class="tab-content">
+  <div class="card" style="max-width: 900px; margin: 0 auto;">
+    <h2>❓ Frequently Asked Questions</h2>
+    <p style="color: #718096; font-size: 1.1em; margin-bottom: 30px;">Find answers to common questions about our 3D printing service</p>
+    
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFAQ(1)">
+        <span>📦 How long does shipping take?</span>
+        <span class="faq-arrow" id="arrow1">▼</span>
+      </div>
+      <div class="faq-answer" id="faq1">
+        <p>Shipping takes approximately <strong>5-7 business days</strong> after your order has been printed and packaged.</p>
+      </div>
+    </div>
+    
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFAQ(2)">
+        <span>📄 What file formats do you accept?</span>
+        <span class="faq-arrow" id="arrow2">▼</span>
+      </div>
+      <div class="faq-answer" id="faq2">
+        <p>We <strong>only accept STL files</strong>. Any other file formats will be rejected and you will be asked to provide the correct format. Please ensure your file is in STL format before submitting.</p>
+      </div>
+    </div>
+    
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFAQ(3)">
+        <span>🔄 Can I request revisions?</span>
+        <span class="faq-arrow" id="arrow3">▼</span>
+      </div>
+      <div class="faq-answer" id="faq3">
+        <p>Yes! <strong>Revisions will automatically happen</strong> if there are any issues with your print or if it doesn't meet your expectations. We're committed to ensuring you're completely satisfied with the final product.</p>
+      </div>
+    </div>
+    
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFAQ(4)">
+        <span>📧 How will you contact me after I put in my order?</span>
+        <span class="faq-arrow" id="arrow4">▼</span>
+      </div>
+      <div class="faq-answer" id="faq4">
+        <p>We will contact you via <strong>email</strong>. Please make sure to provide a valid email address when submitting your order so we can keep you updated throughout the process.</p>
+      </div>
+    </div>
+    
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFAQ(5)">
+        <span>💰 What is your refund and cancellation policy?</span>
+        <span class="faq-arrow" id="arrow5">▼</span>
+      </div>
+      <div class="faq-answer" id="faq5">
+        <p><strong>Cancellations:</strong> You will have <strong>2 days to cancel your order</strong>. If the order has not been cancelled by then, the payment will go through and production will begin.</p>
+        <p style="margin-top: 10px;"><strong>Refunds/Reprints:</strong> If something has occurred during the print process, we will either <strong>refund or reprint your product</strong> depending on your request.</p>
+        <p style="margin-top: 10px;"><strong>Returns:</strong> We will <strong>NOT accept returns</strong> because 3D prints are entirely custom-made and cannot be reused for another customer.</p>
+      </div>
+    </div>
+    
+  </div>
 </div>
 
 <!-- Our Printer Tab Content -->
@@ -478,12 +589,23 @@ function switchTab(tab) {
     document.getElementById('homeTab').classList.add('active');
   } else if (tab === 'printer') {
     document.getElementById('printerTab').classList.add('active');
+  } else if (tab === 'faq') {
+    document.getElementById('faqTab').classList.add('active');
   } else {
     document.getElementById('contactTab').classList.add('active');
   }
   
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// FAQ Toggle
+function toggleFAQ(num) {
+  const answer = document.getElementById('faq' + num);
+  const arrow = document.getElementById('arrow' + num);
+  
+  answer.classList.toggle('open');
+  arrow.classList.toggle('open');
 }
 
 // Why Bambu Lab modal functions
